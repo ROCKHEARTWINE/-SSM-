@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.company.proj">
+    </context:component-scan>
+
+    <bean class="org.apache.activemq.ActiveMQConnectionFactory"
+          id="activeMQConnectionFactory"
+          p:brokerURL="${jms.server}">
+    </bean>
+    <bean class="org.springframework.jms.connection.SingleConnectionFactory"
+          id="singleConnectionFactory"
+          p:targetConnectionFactory-ref="activeMQConnectionFactory">
+    </bean>
+    <bean class="org.apache.activemq.command.ActiveMQQueue"
+          p:physicalName="sms" id="smsQueue">
+    </bean>
+    <bean class="org.springframework.jms.core.JmsTemplate" id="jmsTemplate"
+          p:connectionFactory-ref="singleConnectionFactory"
+          p:defaultDestination-ref="smsQueue">
+    </bean>
+
+
+</beans>

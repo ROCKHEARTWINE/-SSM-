@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--添加注册应用名-->
+    <dubbo:application name="dubbo-search-provider"></dubbo:application>
+    <!--添加注册中心服务器地址-->
+    <dubbo:registry address="zookeeper://192.168.139.180:2181"></dubbo:registry>
+    <!--添加要扫描的服务-->
+    <dubbo:annotation package="com.company.proj.service"></dubbo:annotation>
+    <!--解决端口冲突问题-->
+    <dubbo:protocol name="dubbo" port="20890"></dubbo:protocol>
+</beans>

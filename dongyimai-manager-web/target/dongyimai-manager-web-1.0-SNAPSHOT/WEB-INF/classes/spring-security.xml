@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!--配置忽略规则-->
+    <http pattern="/faviocn.ico" security="none"></http>
+    <http pattern="/login.html" security="none"></http>
+    <http pattern="/css/**" security="none"></http>
+    <http pattern="/js/**" security="none"></http>
+    <http pattern="/plugins/**" security="none"></http>
+    <http pattern="/img/**" security="none"></http>
+
+    <!--配置拦截规则 -->
+    <http use-expressions="false">
+        <!--拦截地址及需要的权限-->
+        <intercept-url pattern="/**" access="ROLE_ADMIN"></intercept-url>
+        <!--如果不具备该角色，则跳转登录页-->
+        <form-login login-page="/login.html" authentication-failure-url="/login.html"
+                    default-target-url="/admin/index.html" always-use-default-target="true"></form-login>
+        <!--关闭跨站校验-->
+        <csrf disabled="true"></csrf>
+        <!--开启框架验证，子页面与父页面具有相同的验证规则-->
+        <headers>
+            <!--SAMEORIGIN: frame页面的地址只能为同源域下的页面-->
+            <frame-options policy="SAMEORIGIN"></frame-options>
+        </headers>
+
+        <!--注销，自动创建地址、logout用于注销-->
+        <logout></logout>
+    </http>
+
+    <!--配置认证管理器-->
+    <authentication-manager>
+        <authentication-provider>
+            <user-service>
+                <!--必须以ROLE_开头-->
+                <user name="admin" password="123456" authorities="ROLE_ADMIN"></user>
+            </user-service>
+        </authentication-provider>
+    </authentication-manager>
+
+
+</beans:beans>

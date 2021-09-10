@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                                 http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+                                 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+                                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--配置忽略规则-->
+    <http pattern="/favicon.ico" security="none"></http>
+    <!--TODO 注意：“/”不要丢了-->
+    <http pattern="/register.html" security="none"></http>
+    <http pattern="/seller/add.do" security="none"></http>
+    <http pattern="/shoplogin.html" security="none"></http>
+    <http pattern="/cooperation.html" security="none"></http>
+    <http pattern="/css/**" security="none"></http>
+    <http pattern="/img/**" security="none"></http>
+    <http pattern="/js/**" security="none"></http>
+    <http pattern="/plugins/**" security="none"></http>
+
+    <!--配置拦截规则-->
+    <http use-expressions="false">
+        <!--拦截地址以及需要的权限-->
+        <intercept-url pattern="/**" access="ROLE_SELLER"></intercept-url>
+        <!--如果不具备该角色，则跳转到登录页-->
+        <form-login login-page="/shoplogin.html" authentication-failure-url="/shoplogin.html"
+                    default-target-url="/admin/index.html" always-use-default-target="true"
+        ></form-login>
+
+        <!--关闭跨站攻击校验-->
+        <csrf disabled="true"></csrf>
+        <!--开启框架验证，子页面具有和父页面相同的验证规则-->
+        <headers>
+            <!--SAMEORIGIN：frame页面的地址只能为同源域名下的页面-->
+            <frame-options policy="SAMEORIGIN"/>
+        </headers>
+        <!--注销，自动创建地址/logout用于注销-->
+        <logout></logout>
+    </http>
+
+
+    <context:property-placeholder location="classpath*:properties/*.properties"></context:property-placeholder>
+    <!--拷贝dubbo配置， 注意：mvc和安全配置都要有dubbo-->
+    <!--注册客户端名称-->
+    <dubbo:application name="dongyimai-shop-web"></dubbo:application>
+    <!--注册服务器地址-->
+    <dubbo:registry address="${dubbo.address}"></dubbo:registry>
+    <!--通过配置方式-->
+    <dubbo:reference interface="com.company.proj.service.SellerService" id="sellerService"></dubbo:reference>
+
+    <!--配置密码加密器bean-->
+    <beans:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></beans:bean>
+
+    <!--指定认证实现类-->
+    <beans:bean class="com.company.proj.service.impl.UserDetailServiceImpl" id="userDetailServiceImpl">
+        <beans:property name="sellerService" ref="sellerService"></beans:property>
+    </beans:bean>
+    <!--配置认证管理器-->
+    <authentication-manager>
+        <authentication-provider user-service-ref="userDetailServiceImpl">
+            <!--引入密码加密器-->
+            <password-encoder ref="passwordEncoder"></password-encoder>
+        </authentication-provider>
+    </authentication-manager>
+</beans:beans>

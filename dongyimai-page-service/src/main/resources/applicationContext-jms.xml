@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.company.proj">
+    </context:component-scan>
+    <!--activemq连接工厂-->
+    <bean class="org.apache.activemq.ActiveMQConnectionFactory"
+          id="activeMQConnectionFactory"
+          p:brokerURL="tcp://192.168.139.180:61616">
+    </bean>
+    <!--spring连接工厂-->
+    <bean class="org.springframework.jms.connection.SingleConnectionFactory"
+          id="singleConnectionFactory"
+          p:targetConnectionFactory-ref="activeMQConnectionFactory">
+    </bean>
+    <!--目的地-->
+    <bean class="org.apache.activemq.command.ActiveMQQueue"
+          id="createPageQueue"
+          p:physicalName="create-page">
+    </bean>
+
+    <bean class="com.company.proj.listener.CreatePageListener"
+          id="createPageListener">
+    </bean>
+    <bean class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+          p:connectionFactory-ref="singleConnectionFactory"
+          p:messageListener-ref="createPageListener"
+          p:destination-ref="createPageQueue">
+    </bean>
+
+    <bean class="org.apache.activemq.command.ActiveMQQueue"
+          id="deletePageQueue"
+          p:physicalName="delete-page">
+    </bean>
+    <bean class="com.company.proj.listener.DeletePageListener"
+          id="deletePageListener">
+    </bean>
+    <bean class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+          p:connectionFactory-ref="singleConnectionFactory"
+          p:messageListener-ref="deletePageListener"
+          p:destination-ref="deletePageQueue">
+    </bean>
+</beans>
